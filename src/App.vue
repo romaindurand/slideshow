@@ -1,28 +1,38 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <ImportImages v-if="!currentImagePath" />
+    <Slide v-if="currentImagePath" :image-path="currentImagePath"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import ImportImages from './components/ImportImages.vue'
+import Slide from './components/Slide.vue'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    ImportImages, Slide
+  },
+  computed: {
+    ...mapGetters(['currentImagePath'])
+  },
+  methods: {
+    ...mapMutations(['nextImage'])
+  },
+  mounted () {
+    window.addEventListener('keyup', event => {
+      console.log(event)
+      switch (event.key) {
+        case 'ArrowRight':
+          this.nextImage()
+          break
+      }
+    })
   }
 }
 </script>
 
 <style lang="less">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
