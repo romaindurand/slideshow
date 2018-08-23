@@ -8,7 +8,8 @@ app.on('ready', () => {
   let window = new BrowserWindow({
     width: 800,
     height: 600,
-    webPreferences: { webSecurity: !isDev }
+    webPreferences: { webSecurity: !isDev },
+    autoHideMenuBar: true
   })
   if (isDev) {
     require('vue-devtools').install()
@@ -29,17 +30,17 @@ ipcMain.on('set-folder-request', async (event, folderPath) => {
     let fileContent = await fs.readFile(configPath)
     config = JSON.parse(fileContent)
   } else {
+    const files = await fs.readdir(folderPath)
+    const images = files.filter(file => {
+      const extension = file.toLowerCase().split('.').pop()
+      return extensions.includes(extension)
+    })
     config = {
-      images: [],
+      images,
       tags: []
     }
     let fileContent = JSON.stringify(config)
     await fs.writeFile(configPath, fileContent)
   }
-  const files = await fs.readdir(folderPath)
-  config.images = files.filter(file => {
-    const extension = file.toLowerCase().split('.').pop()
-    return extensions.includes(extension)
-  })
   event.sender.send('set-folder-reply', config)
 })

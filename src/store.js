@@ -8,7 +8,12 @@ export default new Vuex.Store({
   state: {
     folderPath: null,
     images: [],
-    index: null
+    index: null,
+    interval: 1000,
+    intervalId: null,
+    autoplay: false,
+    bgColor: '#333',
+    random: true
   },
   mutations: {
     setImages (state, images) {
@@ -21,10 +26,59 @@ export default new Vuex.Store({
       state.index = index
     },
     nextImage (state) {
-      state.index = state.index + 1 > state.images.length - 1 ? 0 : state.index + 1
+      if (state.random) {
+        state.index = Math.round(Math.random() * (state.images.length - 1))
+      } else {
+        state.index = state.index + 1 > state.images.length - 1 ? 0 : state.index + 1
+      }
+    },
+    previousImage (state) {
+      state.index = state.index - 1 < 0 ? state.images.length - 1 : state.index - 1
+    },
+    setIntervalId (state, intervalId) {
+      state.intervalId = intervalId
+    },
+    setInterval (state, interval) {
+      state.interval = interval
+    },
+    setAutoplay (state, autoplay) {
+      state.autoplay = autoplay
+    },
+    setBgColor (state, color) {
+      state.bgColor = color
     }
   },
-  actions: {},
+  actions: {
+    async play ({commit, state, dispatch}) {
+      await dispatch('pause')
+      const intervalId = window.setInterval(() => {
+        commit('nextImage')
+      }, state.interval)
+      commit('setIntervalId', intervalId)
+      commit('setAutoplay', true)
+    },
+
+    pause ({commit, state}) {
+      if (state.intervalId) window.clearInterval(state.intervalId)
+      commit('setAutoplay', false)
+      commit('setIntervalId', null)
+    },
+
+    toggleAutoplay ({state, dispatch}) {
+      if (state.autoplay) dispatch('pause')
+      else dispatch('play')
+    },
+
+    speedUp ({state, commit, dispatch}) {
+      commit('setInterval', state.interval / 2)
+      dispatch('play')
+    },
+
+    speedDown ({state, commit, dispatch}) {
+      commit('setInterval', state.interval * 2)
+      dispatch('play')
+    }
+  },
   getters: {
     currentImagePath: state =>
       state.images && state.images.length && Number.isInteger(state.index) && state.folderPath

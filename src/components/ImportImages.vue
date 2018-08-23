@@ -1,6 +1,7 @@
 <template>
-  <div>
-    <input type="file" webkitdirectory @change="handleFileInput"/>
+  <div class="container">
+    <h1>CLIQUEZ</h1>
+    <input type="file" webkitdirectory @change="handleFileInput" class="fileInput"/>
   </div>
 </template>
 
@@ -25,5 +26,17 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
+.container, .fileInput {
+  height: 100vh;
+  width: 100%;
+}
+.fileInput {
+  position: absolute;
+  opacity: 0;
+  top: 0;
+}
+h1 {
+  margin: 0;
+}
 </style>
